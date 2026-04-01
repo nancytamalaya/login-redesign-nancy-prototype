@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running pre-commit checks..."
+
+echo ""
+echo "=== Type check ==="
+npm run type-check
+
+echo ""
+echo "=== Secrets scan ==="
+./scripts/scan-secrets.sh
+
+echo ""
+echo "All pre-commit checks passed."

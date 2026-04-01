@@ -1,0 +1,51 @@
+---
+description: When creating a new component, replace the default HomeView on the / route with a new view that renders the component
+alwaysApply: true
+---
+
+# Auto-replace Default Route on New Component Creation
+
+When the user asks you to create a new component and the `/` route in `src/router/index.ts` still points to `HomeView`, treat this as a fresh project and wire the new component into the root route:
+
+1. **Create the component** in `src/components/` as usual.
+2. **Create a new view** in `src/views/` named after the user's request (e.g., `DashboardView.vue`). The view should import and render the new component:
+
+```vue
+<script setup lang="ts">
+import MyComponent from '@/components/MyComponent.vue'
+</script>
+
+<template>
+  <main>
+    <MyComponent />
+  </main>
+</template>
+```
+
+3. **Update `src/router/index.ts`** — replace the `HomeView` import and component reference with the new view:
+
+```typescript
+import DashboardView from '../views/DashboardView.vue'
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: DashboardView,
+    },
+  ],
+})
+```
+
+**Only do this when the `/` route still references `HomeView`.**
+
+## When the `/` route has already been replaced
+
+If the `/` route no longer points to `HomeView` (i.e., a previous component already took over the root), do the following instead:
+
+1. **Create the component** in `src/components/` as usual.
+2. **Create a new view** in `src/views/` that imports and renders the component.
+3. **Add a new route** in `src/router/index.ts` with a contextually relevant path (e.g., `/settings`, `/reports`). Derive the path and route name from the component's purpose.
+4. **Add a link to the new route from the current `/` view.** Open the view rendered by `/`, and add a `<RouterLink>` (or navigation element using the design system) that points to the new route. Place it where it makes contextual sense — in a nav bar, sidebar, card grid, or action area — rather than appending a bare link at the bottom.

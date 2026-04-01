@@ -1,0 +1,75 @@
+---
+description: How to use @alayacare/alaya-design-system components in Vue files
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Alaya Design System
+
+All UI should be built using `@alayacare/alaya-design-system` components. Do **not** use raw HTML elements when a design system component exists.
+
+## Setup (already done in main.ts)
+
+The plugin is installed with `app.use(install, { lang: 'en' })` and CSS is imported globally. You do **not** need to repeat this setup.
+
+## Importing Components
+
+Components are **not** registered globally. Import them per-file:
+
+```vue
+<script setup lang="ts">
+import { AcButton, AcInputText, AcCard } from '@alayacare/alaya-design-system'
+</script>
+
+<template>
+  <AcCard>
+    <template #content>
+      <AcInputText v-model="name" placeholder="Enter name" />
+      <AcButton label="Submit" @click="handleSubmit" />
+    </template>
+  </AcCard>
+</template>
+```
+
+## Naming Convention
+
+All components are prefixed with `Ac`: `AcButton`, `AcDialog`, `AcDataTable`, etc.
+
+## Available Components (non-exhaustive)
+
+**Layout**: AcCard, AcDivider, AcPanel, AcSplitter, AcToolbar, AcScrollPanel
+**Form**: AcInputText, AcTextarea, AcDropdown, AcCheckbox, AcRadioButton, AcInputNumber, AcInputSwitch, AcMultiSelect, AcCalendar, AcPassword, AcAutoComplete, AcInputPhoneNumber, AcEditor
+**Buttons**: AcButton, AcSplitButton, AcSpeedDial, AcToggleButton, AcSelectButton
+**Data**: AcDataTable, AcDataView, AcPaginator, AcTree, AcTreeTable, AcOrderList, AcPickList, AcTimeline, AcOrganizationChart
+**Overlay**: AcDialog, AcSidebar, AcOverlayPanel, AcConfirmDialog, AcConfirmPopup, AcToast
+**Navigation**: AcMenu, AcMenubar, AcTabMenu, AcTabView, AcBreadcrumb, AcSteps, AcMegaMenu, AcTieredMenu, AcPanelMenu, AcContextMenu
+**Feedback**: AcMessage, AcInlineMessage, AcProgressBar, AcProgressSpinner, AcSkeleton, AcBadge, AcTag, AcChip
+**Media**: AcGalleria, AcCarousel, AcImagePreview, AcChart, AcMap
+**Misc**: AcAvatar, AcAvatarGroup, AcAccordion, AcFileUpload, AcEmptyState, AcHeading
+
+## Services
+
+```typescript
+import { useAcToast, useAcConfirmation } from '@alayacare/alaya-design-system'
+
+const toast = useAcToast()
+toast.add({ severity: 'success', summary: 'Done', detail: 'Record saved', life: 3000 })
+
+const confirm = useAcConfirmation()
+confirm.require({ message: 'Are you sure?', accept: () => { /* ... */ } })
+```
+
+## Grid Utilities
+
+Use `acds-row` and `acds-col-*` classes from `system.utils.css` for layout:
+
+```html
+<div class="acds-row">
+  <div class="acds-col-6">Left</div>
+  <div class="acds-col-6">Right</div>
+</div>
+```
+
+## Documentation
+
+Component docs and examples: https://design-system.alayacare.com/main/storybook/

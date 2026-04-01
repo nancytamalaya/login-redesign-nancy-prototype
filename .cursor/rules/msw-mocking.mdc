@@ -1,0 +1,49 @@
+---
+description: How to mock API endpoints with MSW (Mock Service Worker)
+globs: "src/mocks/**"
+alwaysApply: false
+---
+
+# MSW API Mocking
+
+MSW intercepts network requests in the browser. This project has no real backend — MSW is the API layer and runs in **all** environments (dev and production builds). It is already configured to start automatically in `main.ts` before the app mounts.
+
+## Adding a Mock Handler
+
+Add handlers to `src/mocks/handlers.ts`:
+
+```typescript
+import { http, HttpResponse } from 'msw'
+
+export const handlers = [
+  http.get('/api/health', () => {
+    return HttpResponse.json({ status: 'ok' })
+  }),
+
+  http.get('/api/users', () => {
+    return HttpResponse.json([
+      { id: '1', name: 'Alice' },
+      { id: '2', name: 'Bob' },
+    ])
+  }),
+
+  http.post('/api/users', async ({ request }) => {
+    const body = await request.json()
+    return HttpResponse.json(body, { status: 201 })
+  }),
+
+  http.get('/api/users/:id', ({ params }) => {
+    return HttpResponse.json({ id: params.id, name: 'Alice' })
+  }),
+]
+```
+
+## Conventions
+
+- All mock handlers go in `src/mocks/handlers.ts`
+- Use `http.get`, `http.post`, `http.put`, `http.patch`, `http.delete` from `msw`
+- Return responses with `HttpResponse.json(data, options?)`
+- Use route params via `({ params })` and request body via `await request.json()`
+- Unhandled requests pass through to the real network (`onUnhandledRequest: 'bypass'`)
+- MSW must **never** be gated behind `import.meta.env.DEV` — it runs in all environments
+- Mock data should be realistic enough to prototype UI interactions

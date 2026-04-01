@@ -1,0 +1,44 @@
+---
+description: Core project conventions for the ACCloud prototype template
+alwaysApply: true
+---
+
+# Project Conventions
+
+This is a Vue 3 + TypeScript prototype template using the AlayaCare Design System.
+
+## Tech Stack
+
+- **Vue 3** with `<script setup lang="ts">` (Composition API)
+- **TypeScript** (strict mode with `noUncheckedIndexedAccess`)
+- **Vite** as build tool
+- **Vue Router** for routing (`src/router/index.ts`)
+- **Pinia** for state management (`src/stores/`)
+- **MSW** (Mock Service Worker) for API mocking in development
+- **@alayacare/alaya-design-system** for all UI components
+
+## Project Structure
+
+```
+src/
+├── assets/          # CSS and static assets
+├── components/      # Reusable components
+├── mocks/           # MSW handlers for API mocking
+│   ├── browser.ts   # Worker setup
+│   └── handlers.ts  # Request handlers
+├── router/          # Vue Router config
+│   └── index.ts
+├── stores/          # Pinia stores
+├── views/           # Route-level page components
+├── App.vue          # Root layout with <RouterView />
+└── main.ts          # App bootstrap
+```
+
+## Key Conventions
+
+- Use `@/` path alias to import from `src/` (e.g., `import Foo from '@/components/Foo.vue'`)
+- All components use `<script setup lang="ts">` syntax
+- Page-level components go in `src/views/`, reusable components in `src/components/`
+- Always prefer Alaya Design System (`Ac`-prefixed) components over raw HTML elements
+- This project has no real backend — MSW runs in all environments as the API layer
+- Add mock API handlers in `src/mocks/handlers.ts`; never gate MSW behind a DEV check

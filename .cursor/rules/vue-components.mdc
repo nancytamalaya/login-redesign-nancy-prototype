@@ -1,0 +1,80 @@
+---
+description: Patterns for creating Vue components and views
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Vue Components
+
+## Component Template
+
+All components use `<script setup lang="ts">` with the Composition API:
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { AcButton } from '@alayacare/alaya-design-system'
+
+interface Props {
+  title: string
+  count?: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  count: 0,
+})
+
+const emit = defineEmits<{
+  submit: [value: string]
+}>()
+</script>
+
+<template>
+  <div>
+    <h2>{{ props.title }}</h2>
+    <AcButton label="Submit" @click="emit('submit', 'done')" />
+  </div>
+</template>
+
+<style scoped>
+</style>
+```
+
+## Views vs Components
+
+| Aspect | Views (`src/views/`) | Components (`src/components/`) |
+|--------|---------------------|-------------------------------|
+| Purpose | Full pages tied to routes | Reusable UI pieces |
+| Naming | `*View.vue` (e.g., `DashboardView.vue`) | Descriptive (e.g., `UserCard.vue`) |
+| Used by | Router only | Any Vue file |
+
+## Icons
+
+Use **Phosphor Icons** from the Alaya Design System. Always apply two CSS classes: the base `ph` class and the icon-specific `ph-<icon-name>` class.
+
+```vue
+<!-- ✅ GOOD -->
+<i class="ph ph-house" />
+<i class="ph ph-arrow-right" />
+<i class="ph ph-magnifying-glass" />
+
+<!-- ❌ BAD — don't use inline SVGs or emoji as icons -->
+<svg>...</svg>
+<span>🏠</span>
+```
+
+Size and transform utilities can be added alongside:
+
+```vue
+<i class="ph ph-gear ph-lg" />
+<i class="ph ph-arrow-left ph-rotate-90" />
+```
+
+## Conventions
+
+- Always define props with TypeScript interfaces using `defineProps<Props>()`
+- Always type emits using `defineEmits<{ ... }>()`
+- Use `<style scoped>` to avoid style leaks
+- Prefer Alaya Design System components over raw HTML (see alaya-design-system rule)
+- Use `@/` path alias for imports: `import Foo from '@/components/Foo.vue'`
+- Use Phosphor Icons (`ph ph-<icon-name>`) for all iconography — custom SVGs are fine for illustrations, but never for UI icons

@@ -1,0 +1,55 @@
+---
+description: Patterns for creating and using Pinia stores
+globs: "src/stores/**"
+alwaysApply: false
+---
+
+# Pinia Stores
+
+Stores live in `src/stores/` and use the **composition API** style with `defineStore`.
+
+## Creating a Store
+
+```typescript
+// src/stores/user.ts
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+
+export const useUserStore = defineStore('user', () => {
+  const user = ref<User | null>(null)
+  const isLoggedIn = computed(() => user.value !== null)
+
+  async function fetchUser(id: string) {
+    const res = await fetch(`/api/users/${id}`)
+    user.value = await res.json()
+  }
+
+  function logout() {
+    user.value = null
+  }
+
+  return { user, isLoggedIn, fetchUser, logout }
+})
+```
+
+## Conventions
+
+- File name matches the store domain: `useUserStore` → `src/stores/user.ts`
+- Store name follows `use<Domain>Store` pattern
+- Use composition style (`defineStore('id', () => { ... })`) — not the options style
+- Export only the composable function, not internal refs
+- Return all public state, getters, and actions from the setup function
+
+## Using in Components
+
+```vue
+<script setup lang="ts">
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
+</script>
+
+<template>
+  <p v-if="userStore.isLoggedIn">Welcome, {{ userStore.user?.name }}</p>
+</template>
+```

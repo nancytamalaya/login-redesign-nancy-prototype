@@ -1,0 +1,44 @@
+---
+description: Security rules for prototype code generation -- prototypes are auto-deployed to GitHub Pages
+alwaysApply: true
+---
+
+# Security Rules
+
+This prototype is automatically deployed to GitHub Pages on every push.
+Generated code is visible to all organization members. Secrets detection
+runs at three layers: agent (this rule), local (`scripts/scan-secrets.sh`),
+and CI (gitleaks in the CircleCI pipeline). Prevention is better than detection.
+
+## Prohibited Content
+
+NEVER include any of the following in generated code:
+
+- AWS access keys, secret keys, or session tokens
+- API keys, tokens, or passwords (real or placeholder-looking, e.g. `sk-...`, `AKIA...`)
+- Database connection strings or DSNs
+- Private keys (RSA, SSH, PGP, EC)
+- `.env` files with credential values
+- Hardcoded URLs pointing to internal infrastructure (VPNs, private IPs, internal domains)
+- JWTs, bearer tokens, or session cookies
+- Basic auth credentials (usernames and passwords for real systems)
+
+## Required Practices
+
+- All API interactions MUST use MSW mock handlers in `src/mocks/handlers.ts`
+- Use placeholder/fake data only (e.g., `user@example.com`, `Jane Doe`, `555-0100`)
+- Never fetch from real API endpoints -- MSW intercepts all requests
+- If the user asks to connect to a real API, explain that prototypes use mock data only and add a corresponding MSW handler instead
+- Environment-specific configuration belongs in `.env` files listed in `.gitignore`, never committed
+
+## Pre-commit Hooks
+
+A pre-commit hook runs automatically on every `git commit`. It runs two checks:
+1. **Type check** (`vue-tsc --build`) -- catches type errors before they reach CI
+2. **Secrets scan** (gitleaks via `scripts/scan-secrets.sh`) -- blocks commits containing credentials
+
+The hook is installed automatically by `npm install` (via the `prepare` script).
+You do not need to run the hook or vue-tsc manually.
+If it reports findings, fix the issues before committing. If absolutely necessary,
+the hook can be bypassed with `git commit --no-verify`, but CI will still block
+any secrets from being deployed.

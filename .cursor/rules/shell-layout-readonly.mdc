@@ -1,0 +1,17 @@
+---
+description: Prevents modification of the shell layout scaffolding components (TopBar, SideBar, and their assets)
+alwaysApply: true
+---
+
+# Shell Layout Components Are Read-Only
+
+The following files provide the application shell (TopBar + SideBar) and must **never** be modified:
+
+- `src/components/AppTopBar.vue`
+- `src/components/AppSideBar.vue`
+- `src/assets/alayacare-logo-white.svg`
+- `src/assets/alayacare-logo-a.svg`
+
+These are static scaffolding that replicates the production webapp layout from `accloud-shell-layout-blocks-service`. They are intentionally non-functional and should remain unchanged across all prototypes.
+
+If a user asks to change the top bar, sidebar, or logo, explain that these are locked scaffolding components shared across prototypes and should not be customized. Prototype work should happen inside `src/views/` and `src/components/` (excluding the two files above).
