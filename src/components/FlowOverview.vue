@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { RouterLink } from 'vue-router'
 import type { PageState } from 'primevue/paginator'
 
 interface FlowRun {
@@ -70,6 +71,11 @@ function goBack() {
 
 <template>
   <div class="flow-overview">
+    <p class="prototype-nav">
+      <RouterLink class="prototype-link" :to="{ name: 'vacant-visit-scheduler-config' }">
+        Open Vacant Visit Scheduler — branch config (Figma prototype)
+      </RouterLink>
+    </p>
     <header class="flow-header">
       <div class="header-left">
         <AcButton
@@ -179,6 +185,21 @@ function goBack() {
   padding: 24px;
   background-color: var(--surface-ground, #f8f9fa);
   min-height: 100%;
+}
+
+.prototype-nav {
+  margin: 0 0 16px;
+}
+
+.prototype-link {
+  font-size: 0.875rem;
+  color: var(--p-primary-color, #1d5eed);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prototype-link:hover {
+  text-decoration: none;
 }
 
 .flow-header {
