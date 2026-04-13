@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const branchOptions = [
   { label: 'Texas', value: 'texas' },
@@ -38,16 +41,12 @@ const autoApprove = ref(false)
 const escalateGroup = ref('scheduling-supervisor')
 const escalateAssignee = ref('alexandra-dunne')
 
-/** Step tree — completed steps use checked checkboxes (Figma checkmarks as ADS checkboxes). */
-const treeStepIdentifyDone = ref(true)
-const treeStepMatchDone = ref(true)
-const treeStepApproveDone = ref(true)
-const treeStepFinalizeDone = ref(false)
-
-const notifyAssigneeOnEscalation = ref(true)
-
 function goBack() {
-  window.history.back()
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push({ name: 'home' })
+  }
 }
 
 function onAddOverride() {
@@ -94,40 +93,19 @@ function onSave() {
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Identify and Prioritize Vacant Visits</span>
-          <AcCheckbox
-            v-model="treeStepIdentifyDone"
-            binary
-            hide-label
-            input-id="tree-step-identify"
-            class="tree-checkbox"
-            aria-label="Step complete: Identify and Prioritize Vacant Visits"
-          />
+          <i class="ph ph-check-circle tree-check" aria-hidden="true" title="Complete" />
         </div>
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Match and Offer to Caregivers</span>
-          <AcCheckbox
-            v-model="treeStepMatchDone"
-            binary
-            hide-label
-            input-id="tree-step-match"
-            class="tree-checkbox"
-            aria-label="Step complete: Match and Offer to Caregivers"
-          />
+          <i class="ph ph-check-circle tree-check" aria-hidden="true" title="Complete" />
         </div>
         <div class="tree-row tree-row-expandable">
           <button type="button" class="tree-toggle" aria-expanded="true" aria-label="Toggle step">
             <i class="ph ph-caret-down" aria-hidden="true" />
           </button>
           <span class="tree-label">Approve Assignment or Escalate</span>
-          <AcCheckbox
-            v-model="treeStepApproveDone"
-            binary
-            hide-label
-            input-id="tree-step-approve"
-            class="tree-checkbox"
-            aria-label="Step complete: Approve Assignment or Escalate"
-          />
+          <i class="ph ph-check-circle tree-check" aria-hidden="true" title="Complete" />
         </div>
         <div class="tree-row tree-row-nested tree-row-active">
           <span class="tree-label">Branch</span>
@@ -141,14 +119,7 @@ function onSave() {
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Finalize and Publish Agent</span>
-          <AcCheckbox
-            v-model="treeStepFinalizeDone"
-            binary
-            hide-label
-            input-id="tree-step-finalize"
-            class="tree-checkbox"
-            aria-label="Step complete: Finalize and Publish Agent"
-          />
+          <span class="tree-trail-spacer" aria-hidden="true" />
         </div>
       </aside>
 
@@ -355,13 +326,6 @@ function onSave() {
                 />
                 <label for="auto-approve" class="switch-label">Auto-approve</label>
               </div>
-              <AcCheckbox
-                v-model="notifyAssigneeOnEscalation"
-                binary
-                input-id="notify-assignee"
-                label="Notify escalation assignee by email"
-                class="field-block escalation-checkbox"
-              />
               <AcDropdown
                 v-model="escalateGroup"
                 :options="escalateGroupOptions"
@@ -525,17 +489,16 @@ function onSave() {
   line-height: 1.25;
 }
 
-:deep(.tree-checkbox) {
+.tree-check {
   flex-shrink: 0;
-  margin: 0;
+  font-size: 1.25rem;
+  color: var(--p-green-500, #22c55e);
 }
 
-:deep(.tree-checkbox .p-checkbox) {
-  vertical-align: middle;
-}
-
-:deep(.tree-checkbox [data-pc-section='root']) {
-  margin-bottom: 0;
+.tree-trail-spacer {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .tree-row-nested {
@@ -699,10 +662,6 @@ function onSave() {
 
 :deep(.form-inputswitch.p-inputswitch) {
   flex-shrink: 0;
-}
-
-:deep(.escalation-checkbox) {
-  max-width: 420px;
 }
 
 .switch-label {

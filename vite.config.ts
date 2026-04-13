@@ -7,6 +7,10 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 // https://vite.dev/config/
 export default defineConfig({
   base: process.env.VITE_BASE || '/',
+  server: {
+    // Hash router: open the tenant config home route (see src/router/index.ts).
+    open: '/#/',
+  },
   plugins: [
     vue(),
     vueJsx(),
