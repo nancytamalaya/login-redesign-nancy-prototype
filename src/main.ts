@@ -11,14 +11,28 @@ import './assets/base.css'
 import App from './App.vue'
 import router from './router'
 
+const MSW_START_TIMEOUT_MS = 8000
+
 async function prepareApp() {
-  const { worker } = await import('./mocks/browser')
-  await worker.start({
-    onUnhandledRequest: 'bypass',
-    serviceWorker: {
-      url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
-    },
-  })
+  try {
+    const { worker } = await import('./mocks/browser')
+    await Promise.race([
+      worker.start({
+        onUnhandledRequest: 'bypass',
+        serviceWorker: {
+          url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
+        },
+      }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('MSW start timed out')), MSW_START_TIMEOUT_MS)
+      }),
+    ])
+  } catch (err) {
+    console.warn(
+      '[MSW] Mock worker did not start (blocked, unsupported, or slow). The UI will still load.',
+      err,
+    )
+  }
 
   const app = createApp(App)
 
@@ -30,4 +44,4 @@ async function prepareApp() {
   app.mount('#app')
 }
 
-prepareApp()
+void prepareApp()
