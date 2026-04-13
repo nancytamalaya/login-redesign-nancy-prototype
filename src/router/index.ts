@@ -4,17 +4,15 @@ import TenantConfigBranchView from '../views/TenantConfigBranchView.vue'
 /**
  * Hash history works on static hosts (e.g. GitHub Pages) without server rewrites.
  *
- * Vacant Visit Scheduler (Figma branch config) lives at:
- * - http://localhost:5173/#/
- * - http://localhost:5173/#/tenant-config
+ * Tenant config (Figma node 7519-44878): http://localhost:5173/#/tenant-config
+ * Root hash redirects there so /#/ also resolves to the same screen.
  */
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: TenantConfigBranchView,
+      redirect: { name: 'tenant-config' },
     },
     {
       path: '/tenant-config',

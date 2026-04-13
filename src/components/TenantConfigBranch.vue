@@ -41,11 +41,19 @@ const autoApprove = ref(false)
 const escalateGroup = ref('scheduling-supervisor')
 const escalateAssignee = ref('alexandra-dunne')
 
+/** Step tree — AcCheckbox mirrors Figma completion state + shows checkbox control type. */
+const treeStepIdentifyDone = ref(true)
+const treeStepMatchDone = ref(true)
+const treeStepApproveDone = ref(true)
+const treeStepFinalizeDone = ref(false)
+
+const notifyAssigneeOnEscalation = ref(true)
+
 function goBack() {
   if (window.history.length > 1) {
     router.back()
   } else {
-    router.push({ name: 'home' })
+    router.push({ name: 'tenant-config' })
   }
 }
 
@@ -69,7 +77,7 @@ function onSave() {
         <div class="title-row-primary">
           <AcButton
             icon="ph ph-arrow-left"
-            class="p-button-outlined back-btn-inline"
+            class="p-button-outlined p-button-rounded back-btn-inline"
             aria-label="Go back"
             @click="goBack"
           />
@@ -93,19 +101,40 @@ function onSave() {
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Identify and Prioritize Vacant Visits</span>
-          <i class="ph ph-check-circle tree-check" aria-hidden="true" title="Complete" />
+          <AcCheckbox
+            v-model="treeStepIdentifyDone"
+            binary
+            hide-label
+            input-id="tree-step-identify"
+            class="tree-checkbox"
+            aria-label="Step complete: Identify and Prioritize Vacant Visits"
+          />
         </div>
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Match and Offer to Caregivers</span>
-          <i class="ph ph-check-circle tree-check" aria-hidden="true" title="Complete" />
+          <AcCheckbox
+            v-model="treeStepMatchDone"
+            binary
+            hide-label
+            input-id="tree-step-match"
+            class="tree-checkbox"
+            aria-label="Step complete: Match and Offer to Caregivers"
+          />
         </div>
         <div class="tree-row tree-row-expandable">
           <button type="button" class="tree-toggle" aria-expanded="true" aria-label="Toggle step">
             <i class="ph ph-caret-down" aria-hidden="true" />
           </button>
           <span class="tree-label">Approve Assignment or Escalate</span>
-          <i class="ph ph-check-circle tree-check" aria-hidden="true" title="Complete" />
+          <AcCheckbox
+            v-model="treeStepApproveDone"
+            binary
+            hide-label
+            input-id="tree-step-approve"
+            class="tree-checkbox"
+            aria-label="Step complete: Approve Assignment or Escalate"
+          />
         </div>
         <div class="tree-row tree-row-nested tree-row-active">
           <span class="tree-label">Branch</span>
@@ -119,7 +148,14 @@ function onSave() {
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Finalize and Publish Agent</span>
-          <span class="tree-trail-spacer" aria-hidden="true" />
+          <AcCheckbox
+            v-model="treeStepFinalizeDone"
+            binary
+            hide-label
+            input-id="tree-step-finalize"
+            class="tree-checkbox"
+            aria-label="Step complete: Finalize and Publish Agent"
+          />
         </div>
       </aside>
 
@@ -326,6 +362,13 @@ function onSave() {
                 />
                 <label for="auto-approve" class="switch-label">Auto-approve</label>
               </div>
+              <AcCheckbox
+                v-model="notifyAssigneeOnEscalation"
+                binary
+                input-id="notify-assignee"
+                label="Notify escalation assignee by email"
+                class="field-block escalation-checkbox"
+              />
               <AcDropdown
                 v-model="escalateGroup"
                 :options="escalateGroupOptions"
@@ -402,6 +445,11 @@ function onSave() {
   flex-shrink: 0;
   border-color: #7d8a9e;
   color: var(--text-secondary);
+}
+
+:deep(.back-btn-inline .p-button-icon),
+:deep(.back-btn-inline [data-pc-section='icon']) {
+  font-size: 1.125rem;
 }
 
 .page-title {
@@ -489,16 +537,13 @@ function onSave() {
   line-height: 1.25;
 }
 
-.tree-check {
+:deep(.tree-checkbox) {
   flex-shrink: 0;
-  font-size: 1.25rem;
-  color: var(--p-green-500, #22c55e);
+  margin: 0;
 }
 
-.tree-trail-spacer {
-  flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
+:deep(.tree-checkbox .p-checkbox) {
+  vertical-align: middle;
 }
 
 .tree-row-nested {
@@ -662,6 +707,10 @@ function onSave() {
 
 :deep(.form-inputswitch.p-inputswitch) {
   flex-shrink: 0;
+}
+
+:deep(.escalation-checkbox) {
+  max-width: 420px;
 }
 
 .switch-label {
