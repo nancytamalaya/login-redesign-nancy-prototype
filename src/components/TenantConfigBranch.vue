@@ -38,6 +38,14 @@ const autoApprove = ref(false)
 const escalateGroup = ref('scheduling-supervisor')
 const escalateAssignee = ref('alexandra-dunne')
 
+/** Step tree — completed steps use checked checkboxes (Figma checkmarks as ADS checkboxes). */
+const treeStepIdentifyDone = ref(true)
+const treeStepMatchDone = ref(true)
+const treeStepApproveDone = ref(true)
+const treeStepFinalizeDone = ref(false)
+
+const notifyAssigneeOnEscalation = ref(true)
+
 function goBack() {
   window.history.back()
 }
@@ -58,30 +66,26 @@ function onSave() {
 <template>
   <div class="tenant-config-branch">
     <header class="page-heading">
-      <div class="heading-top">
-        <div class="heading-left">
+      <div class="heading-inner">
+        <div class="title-row-primary">
           <AcButton
             icon="ph ph-arrow-left"
-            class="p-button-outlined back-btn"
+            class="p-button-outlined back-btn-inline"
             aria-label="Go back"
             @click="goBack"
           />
-          <div class="heading-titles">
-            <div class="title-row">
-              <h1 class="page-title">Vacant Visit Scheduler</h1>
-              <AcTag severity="warning-light" value="Configuring" rounded />
-            </div>
-            <p class="page-meta">
-              <span>Scheduling</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span>Autonomous</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span>V1.1</span>
-              <span class="meta-sep" aria-hidden="true">·</span>
-              <span>Updated on 11/01/2026, 18:16, by Administrator</span>
-            </p>
-          </div>
+          <h1 class="page-title">Vacant Visit Scheduler</h1>
+          <AcTag severity="warning-light" value="Configuring" rounded class="title-tag" />
         </div>
+        <p class="page-meta">
+          <span>Scheduling</span>
+          <span class="meta-sep" aria-hidden="true">·</span>
+          <span>Autonomous</span>
+          <span class="meta-sep" aria-hidden="true">·</span>
+          <span>V1.1</span>
+          <span class="meta-sep" aria-hidden="true">·</span>
+          <span>Updated on 11/01/2026, 18:16, by Administrator</span>
+        </p>
       </div>
     </header>
 
@@ -90,19 +94,40 @@ function onSave() {
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Identify and Prioritize Vacant Visits</span>
-          <i class="ph ph-check-circle tree-check" aria-hidden="true" />
+          <AcCheckbox
+            v-model="treeStepIdentifyDone"
+            binary
+            hide-label
+            input-id="tree-step-identify"
+            class="tree-checkbox"
+            aria-label="Step complete: Identify and Prioritize Vacant Visits"
+          />
         </div>
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Match and Offer to Caregivers</span>
-          <i class="ph ph-check-circle tree-check" aria-hidden="true" />
+          <AcCheckbox
+            v-model="treeStepMatchDone"
+            binary
+            hide-label
+            input-id="tree-step-match"
+            class="tree-checkbox"
+            aria-label="Step complete: Match and Offer to Caregivers"
+          />
         </div>
         <div class="tree-row tree-row-expandable">
           <button type="button" class="tree-toggle" aria-expanded="true" aria-label="Toggle step">
             <i class="ph ph-caret-down" aria-hidden="true" />
           </button>
           <span class="tree-label">Approve Assignment or Escalate</span>
-          <i class="ph ph-check-circle tree-check" aria-hidden="true" />
+          <AcCheckbox
+            v-model="treeStepApproveDone"
+            binary
+            hide-label
+            input-id="tree-step-approve"
+            class="tree-checkbox"
+            aria-label="Step complete: Approve Assignment or Escalate"
+          />
         </div>
         <div class="tree-row tree-row-nested tree-row-active">
           <span class="tree-label">Branch</span>
@@ -116,6 +141,14 @@ function onSave() {
         <div class="tree-row">
           <span class="tree-spacer" />
           <span class="tree-label">Finalize and Publish Agent</span>
+          <AcCheckbox
+            v-model="treeStepFinalizeDone"
+            binary
+            hide-label
+            input-id="tree-step-finalize"
+            class="tree-checkbox"
+            aria-label="Step complete: Finalize and Publish Agent"
+          />
         </div>
       </aside>
 
@@ -187,7 +220,7 @@ function onSave() {
                       v-model="generateOffers"
                       input-id="gen-offer-emp"
                       name="generateOffers"
-                      value="employees"
+                      :value="'employees'"
                     />
                     <label for="gen-offer-emp" class="radio-text">Offer visit to employee(s)</label>
                   </div>
@@ -196,7 +229,7 @@ function onSave() {
                       v-model="generateOffers"
                       input-id="gen-offer-assign"
                       name="generateOffers"
-                      value="assign"
+                      :value="'assign'"
                     />
                     <label for="gen-offer-assign" class="radio-text">
                       Assign visit to top employee without an offer
@@ -216,7 +249,7 @@ function onSave() {
                       v-model="offerExpiryType"
                       input-id="exp-now"
                       name="offerExpiryType"
-                      value="now"
+                      :value="'now'"
                     />
                     <label for="exp-now" class="radio-text">Calculate expiry relative to now</label>
                   </div>
@@ -225,7 +258,7 @@ function onSave() {
                       v-model="offerExpiryType"
                       input-id="exp-visit"
                       name="offerExpiryType"
-                      value="visit"
+                      :value="'visit'"
                     />
                     <label for="exp-visit" class="radio-text">
                       Calculate expiry relative to visit start
@@ -253,7 +286,7 @@ function onSave() {
                       v-model="workAssignmentRule"
                       input-id="war-first"
                       name="workAssignmentRule"
-                      value="first"
+                      :value="'first'"
                     />
                     <label for="war-first" class="radio-text">
                       Assign to the employee that responds first
@@ -264,7 +297,7 @@ function onSave() {
                       v-model="workAssignmentRule"
                       input-id="war-highest"
                       name="workAssignmentRule"
-                      value="highest"
+                      :value="'highest'"
                     />
                     <label for="war-highest" class="radio-text">
                       After expiry, assign to employee what was ranked the highest
@@ -277,7 +310,11 @@ function onSave() {
             <div class="form-section">
               <h3 class="section-title">Work Assignment Rules</h3>
               <div class="switch-row">
-                <AcInputSwitch v-model="voiceCallEnabled" input-id="voice-call" />
+                <AcInputSwitch
+                  v-model="voiceCallEnabled"
+                  input-id="voice-call"
+                  class="form-inputswitch"
+                />
                 <label for="voice-call" class="switch-label">Contact top employees via voice call</label>
               </div>
               <AcInputNumber
@@ -311,9 +348,20 @@ function onSave() {
                 If auto-approve is off, escalations become tasks for manual approval.
               </p>
               <div class="switch-row">
-                <AcInputSwitch v-model="autoApprove" input-id="auto-approve" />
+                <AcInputSwitch
+                  v-model="autoApprove"
+                  input-id="auto-approve"
+                  class="form-inputswitch"
+                />
                 <label for="auto-approve" class="switch-label">Auto-approve</label>
               </div>
+              <AcCheckbox
+                v-model="notifyAssigneeOnEscalation"
+                binary
+                input-id="notify-assignee"
+                label="Notify escalation assignee by email"
+                class="field-block escalation-checkbox"
+              />
               <AcDropdown
                 v-model="escalateGroup"
                 :options="escalateGroupOptions"
@@ -369,38 +417,27 @@ function onSave() {
   border-bottom: 1px solid var(--border-panel);
 }
 
-.heading-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.heading-left {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-:deep(.back-btn) {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border-color: #7d8a9e;
-  color: var(--text-secondary);
-}
-
-.heading-titles {
+.heading-inner {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.title-row {
+.title-row-primary {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 16px;
+}
+
+:deep(.back-btn-inline) {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  flex-shrink: 0;
+  border-color: #7d8a9e;
+  color: var(--text-secondary);
 }
 
 .page-title {
@@ -409,6 +446,10 @@ function onSave() {
   font-weight: 600;
   line-height: 1;
   color: var(--text-primary);
+}
+
+.title-tag {
+  flex-shrink: 0;
 }
 
 .page-meta {
@@ -484,10 +525,17 @@ function onSave() {
   line-height: 1.25;
 }
 
-.tree-check {
-  color: var(--p-green-500, #22c55e);
-  font-size: 1.25rem;
+:deep(.tree-checkbox) {
   flex-shrink: 0;
+  margin: 0;
+}
+
+:deep(.tree-checkbox .p-checkbox) {
+  vertical-align: middle;
+}
+
+:deep(.tree-checkbox [data-pc-section='root']) {
+  margin-bottom: 0;
 }
 
 .tree-row-nested {
@@ -627,6 +675,15 @@ function onSave() {
   gap: 9px;
 }
 
+:deep(.radio-line .p-radiobutton) {
+  flex-shrink: 0;
+}
+
+:deep(.radio-line .p-radiobutton-box) {
+  width: 22px;
+  height: 22px;
+}
+
 .radio-text {
   font-size: 0.875rem;
   line-height: 1.5;
@@ -638,6 +695,14 @@ function onSave() {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+:deep(.form-inputswitch.p-inputswitch) {
+  flex-shrink: 0;
+}
+
+:deep(.escalation-checkbox) {
+  max-width: 420px;
 }
 
 .switch-label {
